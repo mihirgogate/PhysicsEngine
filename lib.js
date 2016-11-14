@@ -53,7 +53,7 @@ var NORTHWARD_NORMAL = new Vector(0, -1, 0);
 var WESTWARD_NORMAL = new Vector(-1, 0, 0);
 var EASTWARD_NORMAL = new Vector(1, 0, 0);
 
-function Box(center, width, height, depth, color, mass, velocity, log) {
+function Box(center, width, height, depth, color, mass, velocity) {
   this.center = center;
   this.width = width;
   this.height = height;
@@ -61,7 +61,6 @@ function Box(center, width, height, depth, color, mass, velocity, log) {
   this.color = color;
   this.mass = mass;
   this.velocity = velocity;
-  this.log = log;
 }
 
 Box.prototype.isIntersect = function(other) {
@@ -95,9 +94,6 @@ Box.prototype.getNormalForIntersection = function(other) {
     var depths = [
       TOP_PENETRATION_DEPTH, RIGHT_PENETRATION_DEPTH, BOTTOM_PENETRATION_DEPTH, LEFT_PENETRATION_DEPTH
     ];
-    if (this.log) {
-      console.log(depths);
-    }
     var normals = [
       NORTHWARD_NORMAL, EASTWARD_NORMAL, SOUTHWARD_NORMAL, WESTWARD_NORMAL
     ];
@@ -131,7 +127,20 @@ Box.prototype._isIntersect = function(thisDim, thisSize, otherDim, otherSize) {
   return !((thisRight < otherLeft) || (thisLeft > otherRight));
 }
 
+function Game() {
+  this.objects = [];
+}
+
+Game.prototype.addObject = function(object) {
+  this.objects.push(object);
+}
+
+Game.prototype.getObjects = function() {
+  return this.objects;
+}
+
 module.exports = {
   Vector: Vector,
-  Box: Box
+  Box: Box,
+  Game: Game
 }

@@ -1,5 +1,6 @@
 var Vector = require("./lib.js").Vector;
 var Box = require("./lib.js").Box;
+var Game = require("./lib.js").Game;
 var util = require("util");
 
 var GAME_LOOP_SPEED_IN_MS = 1;
@@ -12,6 +13,27 @@ var COLORS = {
 };
 
 var GRAVITY_ACCELERATION = new Vector(0, 9800, 0);
+
+var GAME = new Game();
+
+$("#myCanvas").click(function(e){
+    var colors = [COLORS.BLACK, COLORS.GREEN, COLORS.GREY];
+    var colorIndex = parseInt(Math.random() * 100) % (colors.length);
+    GAME.addObject(createDummy(e.clientX, e.clientY, colors[colorIndex]));
+});
+
+
+function createDummy(x, y, color) {
+  var HERO_WIDTH = 20;
+  var HERO_HEIGHT = 20;
+  var HERO_DEPTH = 0;
+  var HERO_VELOCITY = new Vector(500, 0, 0);
+  var HERO_MASS = 10;
+  var HERO_ELASTICITY = 1.2;
+  return new Box(
+    new Vector(x, y, 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, color, HERO_MASS, HERO_VELOCITY);
+}
+
 
 window.onload = function() {
     var c = document.getElementById("myCanvas");
@@ -31,11 +53,10 @@ window.onload = function() {
     for (var i = 0; i < NUM_LANDS; i++) {
       var curX = LAND_START.x + (i * LAND_WIDTH);
       var landColor = i % 2 == 0 ? COLORS.BLACK : COLORS.GREY;
-      var shouldLog = (i >= 9 && i <= 9) ? true: false;
       var box = new Box(
         new Vector(curX, LAND_START.y, LAND_START.z),
         LAND_WIDTH, LAND_HEIGHT, LAND_DEPTH, landColor,
-        LAND_MASS, LAND_VELOCITY, shouldLog
+        LAND_MASS, LAND_VELOCITY
       );
       boxs.push(box);
     }
@@ -59,16 +80,17 @@ window.onload = function() {
     var HERO_WIDTH = 20;
     var HERO_HEIGHT = 20;
     var HERO_DEPTH = 0;
-    var HERO_VELOCITY = new Vector(500, 0, 0);
+    var HERO_VELOCITY = new Vector(0, 0, 0);
     var HERO_MASS = 10;
     var HERO_ELASTICITY = 1.2;
     var hero = new Box(
       new Vector(c.width / 2, c.height - LAND_HEIGHT - (3.1 * LAND_HEIGHT), 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, COLORS.GREEN, HERO_MASS, HERO_VELOCITY);
 
     // add objects to a global list
-    var objects = [];
-    objects = objects.concat(boxs);
-    objects.push(hero);
+    for (var i = 0; i < boxs.length; i++) {
+      GAME.addObject(boxs[i]);
+    }
+    GAME.addObject(hero);
 
     // create viewport
     var viewport = new Box(
@@ -97,6 +119,7 @@ window.onload = function() {
     var numGameLoops = 0;
 
     window.setInterval(function(){
+      var objects = GAME.getObjects();
 
       // set positions based on velocity
       for (var i = 0; i < objects.length; i++) {
