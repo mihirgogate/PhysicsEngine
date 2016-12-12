@@ -47,7 +47,6 @@ Vector.prototype.getUnitVector = function() {
   );
 }
 
-
 var SOUTHWARD_NORMAL = new Vector(0, 1, 0);
 var NORTHWARD_NORMAL = new Vector(0, -1, 0);
 var WESTWARD_NORMAL = new Vector(-1, 0, 0);
@@ -99,7 +98,7 @@ Box.prototype.getNormalForIntersection = function(other) {
     ];
 
     // a normal force should only kick in, if enough of the other object is on this object, else the surface area is too small to cause a normal force
-    var PERCENTAGE_OBJECT_FOR_NORMAL = 0.1;
+    var PERCENTAGE_OBJECT_FOR_NORMAL = 0.05;
     var NORTH_SOUTH_CRITERIA = RIGHT_PENETRATION_DEPTH >= PERCENTAGE_OBJECT_FOR_NORMAL * other.width && LEFT_PENETRATION_DEPTH >= PERCENTAGE_OBJECT_FOR_NORMAL * other.width;
     var EAST_WEST_CRITERIA = TOP_PENETRATION_DEPTH >= PERCENTAGE_OBJECT_FOR_NORMAL * other.height && BOTTOM_PENETRATION_DEPTH >= PERCENTAGE_OBJECT_FOR_NORMAL * other.height;
     var criteria = [
