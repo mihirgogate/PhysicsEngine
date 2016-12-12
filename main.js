@@ -16,22 +16,39 @@ var GRAVITY_ACCELERATION = new Vector(0, 9800, 0);
 
 var GAME = new Game();
 
-$("#myCanvas").click(function(e){
+function generateRandom(start, end) {
+  if (start == end) {
+    return start;
+  }
+  var range = (end - start);
+  var factor = parseInt(Math.random() * range * 10) % (range + 1);
+  return start + factor;
+}
+
+function generateRandomColor() {
     var colors = [COLORS.BLACK, COLORS.GREEN, COLORS.GREY];
-    var colorIndex = parseInt(Math.random() * 100) % (colors.length);
-    GAME.addObject(createDummy(e.clientX, e.clientY, colors[colorIndex]));
+    var colorIndex = generateRandom(0, colors.length - 1);
+    return colors[colorIndex];
+}
+
+$("#myCanvas").click(function(e){
+    window.setInterval(function(){
+      var x = e.clientX + generateRandom(0, 300);
+      var y = e.clientY + generateRandom(0, 300);
+      var width = generateRandom(35, 75);
+      var height = generateRandom(35, 75);
+      var vx = generateRandom(0, 2500);
+      var vy = generateRandom(0, 2500);
+      GAME.addObject(createDummy(x, y, generateRandomColor(), vx, vy, width, height, 10));
+  }, 500);
 });
 
 
-function createDummy(x, y, color) {
-  var HERO_WIDTH = 20;
-  var HERO_HEIGHT = 20;
-  var HERO_DEPTH = 0;
-  var HERO_VELOCITY = new Vector(500, 0, 0);
-  var HERO_MASS = 10;
-  var HERO_ELASTICITY = 1.2;
+function createDummy(x, y, color, vx, vy, width, height, mass) {
+  var DUMMY_DEPTH = 0;
+  var DUMMY_VELOCITY = new Vector(vx, vy, 0);
   return new Box(
-    new Vector(x, y, 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, color, HERO_MASS, HERO_VELOCITY);
+    new Vector(x, y, 0), width, height, DUMMY_DEPTH, color, mass, DUMMY_VELOCITY);
 }
 
 
