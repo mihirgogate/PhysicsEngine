@@ -51,6 +51,48 @@ function createDummy(x, y, color, vx, vy, width, height, mass) {
     new Vector(x, y, 0), width, height, DUMMY_DEPTH, color, mass, DUMMY_VELOCITY);
 }
 
+function getLands(canvasHeight) {
+    var boxs = [];
+    var NUM_LANDS = 10;
+    var LAND_WIDTH = 100;
+    var LAND_HEIGHT = 100;
+    var LAND_DEPTH = 0;
+    var LAND_START = new Vector(0, canvasHeight - LAND_HEIGHT, 0);
+    var LAND_MASS = null;
+    var LAND_VELOCITY = new Vector(0, 0 ,0);
+
+    function getLandStrip(numLands, constant, multiplier, otherAxisConstant, isHorizontal) {
+        var boxs = [];
+        for (var i = 0; i < numLands; i++) {
+          var curX = null;
+          var curY = null;
+          if (isHorizontal) {
+            curX = constant + (i * multiplier);
+            curY = otherAxisConstant;
+          } else {
+            curX = otherAxisConstant;
+            curY = constant + (i * multiplier);
+          }
+          var box = new Box(
+            new Vector(curX, curY, LAND_START.z),
+            LAND_WIDTH, LAND_HEIGHT, LAND_DEPTH, generateRandomColor(),
+            LAND_MASS, LAND_VELOCITY
+          );
+          boxs.push(box);
+        }
+        return boxs;
+    }
+    // horizontal strip
+    boxs = boxs.concat(getLandStrip(NUM_LANDS, LAND_START.x, LAND_WIDTH, LAND_START.y, true));
+    // vertical strip
+    boxs = boxs.concat(getLandStrip(NUM_LANDS, LAND_START.y, -LAND_HEIGHT, LAND_START.x, false));
+    // vertical strip
+    boxs = boxs.concat(getLandStrip(NUM_LANDS, LAND_START.y, -LAND_HEIGHT, LAND_START.x + (NUM_LANDS * LAND_WIDTH), false));
+    // small vertical block in between
+    boxs = boxs.concat(getLandStrip(1, LAND_START.y - LAND_HEIGHT, 0, LAND_START.x + (6 * LAND_WIDTH), false));
+    return boxs;
+}
+
 
 window.onload = function() {
     var c = document.getElementById("myCanvas");
@@ -59,39 +101,7 @@ window.onload = function() {
     var ctx = c.getContext("2d");
 
     // create boxs(land)
-    var boxs = [];
-    var NUM_LANDS = 100;
-    var LAND_WIDTH = 100;
-    var LAND_HEIGHT = 100;
-    var LAND_DEPTH = 0;
-    var LAND_START = new Vector(0, c.height - LAND_HEIGHT, 0);
-    var LAND_MASS = null;
-    var LAND_VELOCITY = new Vector(0, 0 ,0);
-    for (var i = 0; i < NUM_LANDS; i++) {
-      var curX = LAND_START.x + (i * LAND_WIDTH);
-      var landColor = i % 2 == 0 ? COLORS.BLACK : COLORS.GREY;
-      var box = new Box(
-        new Vector(curX, LAND_START.y, LAND_START.z),
-        LAND_WIDTH, LAND_HEIGHT, LAND_DEPTH, landColor,
-        LAND_MASS, LAND_VELOCITY
-      );
-      boxs.push(box);
-    }
-    boxs.push(
-      new Box(
-        new Vector(LAND_START.x + (10 * LAND_WIDTH), LAND_START.y - LAND_HEIGHT, LAND_START.z),
-        LAND_WIDTH, LAND_HEIGHT, LAND_DEPTH, landColor,
-        LAND_MASS, LAND_VELOCITY
-      )
-    )
-    boxs.push(
-      new Box(
-        new Vector(LAND_START.x + (6 * LAND_WIDTH), LAND_START.y - LAND_HEIGHT, LAND_START.z),
-        LAND_WIDTH, LAND_HEIGHT, LAND_DEPTH, landColor,
-        LAND_MASS, LAND_VELOCITY
-      )
-    )
-
+    var boxs = getLands(c.height);
 
     // create hero
     var HERO_WIDTH = 20;
@@ -101,7 +111,7 @@ window.onload = function() {
     var HERO_MASS = 10;
     var HERO_ELASTICITY = 1.2;
     var hero = new Box(
-      new Vector(c.width / 2, c.height - LAND_HEIGHT - (3.1 * LAND_HEIGHT), 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, COLORS.GREEN, HERO_MASS, HERO_VELOCITY);
+      new Vector(c.width / 2, 0, 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, COLORS.GREEN, HERO_MASS, HERO_VELOCITY);
 
     // add objects to a global list
     for (var i = 0; i < boxs.length; i++) {
