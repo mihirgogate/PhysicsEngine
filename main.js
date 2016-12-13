@@ -212,13 +212,12 @@ window.onload = function() {
 
 
       numGameLoops += 1;
-      if (numGameLoops >= NUM_LOOPS_IN_FRAME) {
+      if ((numGameLoops % NUM_LOOPS_IN_FRAME) == 0) {
         viewportClear(viewport, ctx);
         viewportCenter(viewport, hero);
         for (var i = 0; i < objects.length; i++) {
           viewportDisplayBox(viewport, ctx, objects[i]);
         }
-        numGameLoops = 0;
       }
     }, GAME_LOOP_SPEED_IN_MS);
 }
