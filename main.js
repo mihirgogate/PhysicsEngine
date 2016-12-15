@@ -1,6 +1,8 @@
 var Vector = require("./lib.js").Vector;
+var Alien = require("./lib.js").Alien;
 var Box = require("./lib.js").Box;
 var Game = require("./lib.js").Game;
+var INF = require("./lib.js").INF;
 var util = require("util");
 
 var GAME_LOOP_SPEED_IN_MS = 1;
@@ -51,6 +53,10 @@ function createDummy(x, y, color, vx, vy, width, height, mass) {
     new Vector(x, y, 0), width, height, DUMMY_DEPTH, color, mass, DUMMY_VELOCITY);
 }
 
+function createAlien(box) {
+  return new Alien(box);
+}
+
 function getLands(canvasHeight) {
     var boxs = [];
     var NUM_LANDS = 10;
@@ -58,7 +64,7 @@ function getLands(canvasHeight) {
     var LAND_HEIGHT = 100;
     var LAND_DEPTH = 0;
     var LAND_START = new Vector(0, canvasHeight - LAND_HEIGHT, 0);
-    var LAND_MASS = null;
+    var LAND_MASS = INF;
     var LAND_VELOCITY = new Vector(0, 0 ,0);
 
     function getLandStrip(numLands, constant, multiplier, otherAxisConstant, isHorizontal) {
@@ -113,6 +119,11 @@ window.onload = function() {
     var hero = new Box(
       new Vector(c.width / 2, 0, 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, COLORS.GREEN, HERO_MASS, HERO_VELOCITY);
 
+
+    var ALIEN_HORIZONTAL_VELOCITY = 1500;
+    var alien = createAlien(createDummy(10, 10, COLORS.BLACK, ALIEN_HORIZONTAL_VELOCITY, 0, 40, 40, 0));
+    GAME.addObject(alien);
+
     // add objects to a global list
     for (var i = 0; i < boxs.length; i++) {
       GAME.addObject(boxs[i]);
@@ -150,7 +161,7 @@ window.onload = function() {
 
       // set positions based on velocity
       for (var i = 0; i < objects.length; i++) {
-        if (objects[i].mass) {
+        if (objects[i].hasFiniteMass()) {
           objects[i].center = objects[i].center.add(objects[i].velocity.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
         }
       }
@@ -158,7 +169,7 @@ window.onload = function() {
       // calculate net force and final velocity of each object
       for (var i = 0; i < objects.length; i++) {
         var currentObject = objects[i];
-        if (currentObject.mass) {
+        if (currentObject.hasFiniteMass() && currentObject.hasNonZeroMass()) {
           // apply force due to gravity
           var totalExternalForce = GRAVITY_ACCELERATION.scalarMultiply(currentObject.mass);
 
@@ -208,6 +219,13 @@ window.onload = function() {
           var finalAcceleration = finalForce.scalarMultiply(1 / currentObject.mass);
           currentObject.velocity = currentObject.velocity.add(finalAcceleration.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
         }
+
+        if (currentObject instanceof Alien) {
+          var angleInDegree = (numGameLoops * Math.PI / 180);
+          var alienInternalForce = new Vector(0, Math.cos(angleInDegree) * 25000, 0);
+          alien.velocity = alien.velocity.add(alienInternalForce.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
+        }
+
       }
 
 

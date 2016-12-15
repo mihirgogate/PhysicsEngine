@@ -1,3 +1,5 @@
+var INF = Number.MAX_VALUE;
+
 function Vector(x, y, z) {
   this.x = x;
   this.y = y;
@@ -60,6 +62,14 @@ function Box(center, width, height, depth, color, mass, velocity) {
   this.color = color;
   this.mass = mass;
   this.velocity = velocity;
+}
+
+Box.prototype.hasFiniteMass = function() {
+  return Number.isInteger(this.mass) && this.mass != INF;
+}
+
+Box.prototype.hasNonZeroMass = function() {
+  return Number.isInteger(this.mass) && this.mass > 0;
 }
 
 Box.prototype.isIntersect = function(other) {
@@ -138,8 +148,16 @@ Game.prototype.getObjects = function() {
   return this.objects;
 }
 
+function Alien(box) {
+  Box.call(this, box.center, box.width, box.height, box.depth, box.color, box.mass, box.velocity);
+}
+Alien.prototype = Object.create(Box.prototype);
+Alien.prototype.constructor = Alien;
+
 module.exports = {
   Vector: Vector,
   Box: Box,
-  Game: Game
+  Game: Game,
+  Alien: Alien,
+  INF: INF
 }
