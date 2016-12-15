@@ -37,15 +37,13 @@ function generateRandomColor() {
 }
 
 $("#myCanvas").click(function(e){
-    window.setInterval(function(){
-      var x = e.clientX + generateRandom(0, 300);
-      var y = e.clientY + generateRandom(0, 300);
-      var width = generateRandom(35, 75);
-      var height = generateRandom(35, 75);
-      var vx = generateRandom(0, 2500);
-      var vy = generateRandom(0, 2500);
-      GAME.addObject(createDummy(x, y, generateRandomColor(), vx, vy, width, height, 10));
-  }, 500);
+    var x = e.clientX;
+    var y = e.clientY;
+    var width = generateRandom(35, 75);
+    var height = generateRandom(35, 75);
+    var vx = generateRandom(0, 2500);
+    var vy = generateRandom(0, 2500);
+    GAME.addObject(createDummy(x, y, generateRandomColor(), vx, vy, width, height, 10));
 });
 
 
