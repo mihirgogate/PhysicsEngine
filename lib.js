@@ -1,4 +1,5 @@
 var INF = Number.MAX_VALUE;
+var ACTIONS = require('./actions').ACTIONS;
 
 function Vector(x, y, z) {
   this.x = x;
@@ -157,6 +158,8 @@ Alien.prototype.constructor = Alien;
 function Hero(box) {
   Box.call(this, box.center, box.width, box.height, box.depth, box.color, box.mass, box.velocity);
   this.hasFiredShot = false;
+  this.previousHorizontalDirection = 1;
+  this.direction = new Vector(1, 0, 0);
 }
 Hero.prototype = Object.create(Box.prototype);
 Hero.prototype.constructor = Hero;
@@ -170,6 +173,41 @@ Hero.prototype.shouldShoot = function(isShootActionActive) {
     this.hasFiredShot = false;
   }
   return false;
+}
+
+Hero.prototype.updateDirection = function(leftRightAction, upDownAction) {
+  var horizontal = null;
+  var vertical = null;
+  if (leftRightAction == ACTIONS.LEFT) {
+    horizontal = -1;
+  }
+  if (leftRightAction == ACTIONS.RIGHT) {
+    horizontal = 1;
+  }
+  if (upDownAction == ACTIONS.UP) {
+    vertical = -1;
+  }
+  if (upDownAction == ACTIONS.DOWN) {
+    vertical = 1;
+  }
+  if(horizontal && vertical) {
+    this.direction.x = horizontal;
+    this.direction.y = vertical;
+  } else if (!horizontal && vertical) {
+    if(this.direction.x != 0) {
+      this.previousHorizontalDirection = this.direction.x;
+    }
+    this.direction.x = 0;
+    this.direction.y = vertical;
+  } else if (horizontal && !vertical) {
+    this.direction.x = horizontal;
+    this.direction.y = 0;
+  } else {
+    if (this.direction.x == 0) {
+      this.direction.x = this.previousHorizontalDirection;
+    }
+    this.direction.y = 0;
+  }
 }
 
 module.exports = {

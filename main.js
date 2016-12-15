@@ -183,16 +183,32 @@ window.onload = function() {
         }
         if (currentObject instanceof Hero) {
             if (currentObject.shouldShoot(keyboardListener.isActive(ACTIONS.SHOOT))) {
-                GAME.addObject(createDummy(hero.center.x + 50, hero.center.y, COLORS.BLACK, 5000, 0, 5, 5, 0));
+                var bulletOffset = 10;
+                var bulletSpeedOffset = 5000;
+                var xOffset = currentObject.direction.x * bulletOffset;
+                var yOffset = currentObject.direction.y * bulletOffset;
+                var xSpeed = currentObject.direction.x * bulletSpeedOffset;
+                var ySpeed = currentObject.direction.y * bulletSpeedOffset;
+                GAME.addObject(createDummy(hero.center.x + xOffset, hero.center.y + yOffset, COLORS.BLACK, xSpeed, ySpeed, 5, 5, 0));
             }
+
+            var leftRightAction = null;
             if (keyboardListener.isActive(ACTIONS.RIGHT)) {
                 currentObject.velocity.x = 1000;
+                leftRightAction = ACTIONS.RIGHT;
             } else if (keyboardListener.isActive(ACTIONS.LEFT)) {
                 currentObject.velocity.x = -1000;
+                leftRightAction = ACTIONS.LEFT;
             } else {
               currentObject.velocity.x = 0;
             }
-
+            var upDownAction = null;
+            if (keyboardListener.isActive(ACTIONS.UP)) {
+                upDownAction = ACTIONS.UP;
+            } else if (keyboardListener.isActive(ACTIONS.DOWN)) {
+                upDownAction = ACTIONS.DOWN;
+            }
+            currentObject.updateDirection(leftRightAction, upDownAction);
         }
 
         if (currentObject.hasFiniteMass() && currentObject.hasNonZeroMass()) {
