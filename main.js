@@ -261,6 +261,14 @@ window.onload = function() {
           }
           var finalAcceleration = finalForce.scalarMultiply(1 / currentObject.mass);
           currentObject.velocity = currentObject.velocity.add(finalAcceleration.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
+
+          // TODO(mihir) - When velocity gets close to 0 cause of rounding errors, set the velocity to 0 to prevent vibrating objects
+          if (Math.abs(currentObject.velocity.y) <= 0.1) {
+            currentObject.velocity.y = 0;
+          }
+          if (Math.abs(currentObject.velocity.x) <= 0.1) {
+            currentObject.velocity.x = 0;
+          }
         }
 
       }
