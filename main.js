@@ -110,15 +110,9 @@ window.onload = function() {
     var boxs = getLands(c.height);
 
     // create hero
-    var HERO_WIDTH = 20;
-    var HERO_HEIGHT = 20;
-    var HERO_DEPTH = 0;
-    var HERO_VELOCITY = new Vector(0, 0, 0);
-    var HERO_MASS = 10;
     var HERO_ELASTICITY = 1.2;
-    var hero = new Box(
-      new Vector(c.width / 2, 0, 0), HERO_WIDTH, HERO_HEIGHT, HERO_DEPTH, COLORS.GREEN, HERO_MASS, HERO_VELOCITY);
-
+    var hero = createDummy(
+      c.width / 2, 0, COLORS.GREEN, 0, 0, 20, 20, 10);
 
     var ALIEN_HORIZONTAL_VELOCITY = 1500;
     var alien = createAlien(createDummy(10, 10, COLORS.BLACK, ALIEN_HORIZONTAL_VELOCITY, 0, 40, 40, 0));
