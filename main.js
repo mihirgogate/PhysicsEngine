@@ -1,9 +1,12 @@
 var Vector = require("./lib.js").Vector;
 var Alien = require("./lib.js").Alien;
+var Hero = require("./lib.js").Hero;
 var Box = require("./lib.js").Box;
 var Game = require("./lib.js").Game;
 var INF = require("./lib.js").INF;
 var util = require("util");
+var KeyboardActionListener = require('./actions').KeyboardActionListener;
+var ACTIONS = require('./actions').ACTIONS;
 
 var GAME_LOOP_SPEED_IN_MS = 1;
 var NUM_LOOPS_IN_FRAME = 4;
@@ -55,6 +58,10 @@ function createDummy(x, y, color, vx, vy, width, height, mass) {
 
 function createAlien(box) {
   return new Alien(box);
+}
+
+function createHero(box) {
+  return new Hero(box);
 }
 
 function getLands(canvasHeight) {
@@ -111,9 +118,17 @@ window.onload = function() {
 
     // create hero
     var HERO_ELASTICITY = 1.2;
-    var hero = createDummy(
-      c.width / 2, 0, COLORS.GREEN, 0, 0, 20, 20, 10);
+    var hero = createHero(createDummy(
+      c.width / 2, 0, COLORS.GREEN, 0, 0, 20, 20, 10));
 
+    // create keyboard listener
+    var jWindow = $(window);
+    var keyboardListener = new KeyboardActionListener(
+      $.proxy(jWindow.keydown, jWindow),
+      $.proxy(jWindow.keyup, jWindow)
+    );
+
+    // create alien
     var ALIEN_HORIZONTAL_VELOCITY = 1500;
     var alien = createAlien(createDummy(10, 10, COLORS.BLACK, ALIEN_HORIZONTAL_VELOCITY, 0, 40, 40, 0));
     GAME.addObject(alien);
@@ -128,7 +143,6 @@ window.onload = function() {
     var viewport = new Box(
       new Vector(0, 0, 0), c.width, c.height, 0, null, 0, null
     )
-
 
     function  viewportDisplayBox(viewport, ctx, box) {
       if (box.color) {
@@ -218,6 +232,11 @@ window.onload = function() {
           var angleInDegree = (numGameLoops * Math.PI / 180);
           var alienInternalForce = new Vector(0, Math.cos(angleInDegree) * 25000, 0);
           alien.velocity = alien.velocity.add(alienInternalForce.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
+        }
+        if (currentObject instanceof Hero) {
+            if (currentObject.shouldShoot(keyboardListener.isActive(ACTIONS.SHOOT))) {
+                GAME.addObject(createDummy(hero.center.x + 10, hero.center.y, COLORS.BLACK, 5000, 0, 5, 5, 0));
+            }
         }
 
       }

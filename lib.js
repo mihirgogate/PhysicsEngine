@@ -154,10 +154,29 @@ function Alien(box) {
 Alien.prototype = Object.create(Box.prototype);
 Alien.prototype.constructor = Alien;
 
+function Hero(box) {
+  Box.call(this, box.center, box.width, box.height, box.depth, box.color, box.mass, box.velocity);
+  this.hasFiredShot = false;
+}
+Hero.prototype = Object.create(Box.prototype);
+Hero.prototype.constructor = Hero;
+
+Hero.prototype.shouldShoot = function(isShootActionActive) {
+  if (isShootActionActive && !this.hasFiredShot) {
+    this.hasFiredShot = true;
+    return true;
+  }
+  if (!isShootActionActive && this.hasFiredShot) {
+    this.hasFiredShot = false;
+  }
+  return false;
+}
+
 module.exports = {
   Vector: Vector,
   Box: Box,
   Game: Game,
   Alien: Alien,
+  Hero: Hero,
   INF: INF
 }
