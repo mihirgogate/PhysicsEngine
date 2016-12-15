@@ -117,9 +117,9 @@ window.onload = function() {
     var boxs = getLands(c.height);
 
     // create hero
-    var HERO_ELASTICITY = 1.2;
+    var HERO_ELASTICITY = 1.01;
     var hero = createHero(createDummy(
-      c.width / 2, 0, COLORS.GREEN, 0, 0, 20, 20, 10));
+      c.width / 2, 0, COLORS.GREEN, 0, 0, 40, 120, 10));
 
     // create keyboard listener
     var jWindow = $(window);
@@ -177,6 +177,26 @@ window.onload = function() {
       // calculate net force and final velocity of each object
       for (var i = 0; i < objects.length; i++) {
         var currentObject = objects[i];
+
+        if (currentObject instanceof Alien) {
+          var angleInDegree = (numGameLoops * Math.PI / 180);
+          var alienInternalForce = new Vector(0, Math.cos(angleInDegree) * 25000, 0);
+          alien.velocity = alien.velocity.add(alienInternalForce.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
+        }
+        if (currentObject instanceof Hero) {
+            if (currentObject.shouldShoot(keyboardListener.isActive(ACTIONS.SHOOT))) {
+                GAME.addObject(createDummy(hero.center.x + 50, hero.center.y, COLORS.BLACK, 5000, 0, 5, 5, 0));
+            }
+            if (keyboardListener.isActive(ACTIONS.RIGHT)) {
+                currentObject.velocity.x = 1000;
+            } else if (keyboardListener.isActive(ACTIONS.LEFT)) {
+                currentObject.velocity.x = -1000;
+            } else {
+              currentObject.velocity.x = 0;
+            }
+
+        }
+
         if (currentObject.hasFiniteMass() && currentObject.hasNonZeroMass()) {
           // apply force due to gravity
           var totalExternalForce = GRAVITY_ACCELERATION.scalarMultiply(currentObject.mass);
@@ -216,6 +236,7 @@ window.onload = function() {
               Math.abs(currentObject.velocity.dotProduct(unitVector))
             ).scalarMultiply(HERO_ELASTICITY).scalarMultiply(currentObject.mass).scalarMultiply(1000 / GAME_LOOP_SPEED_IN_MS);
             totalNormalForce = totalNormalForce.add(resolvedNormalForce);
+
           }
 
           // calculate final force and new velocity
@@ -228,19 +249,7 @@ window.onload = function() {
           currentObject.velocity = currentObject.velocity.add(finalAcceleration.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
         }
 
-        if (currentObject instanceof Alien) {
-          var angleInDegree = (numGameLoops * Math.PI / 180);
-          var alienInternalForce = new Vector(0, Math.cos(angleInDegree) * 25000, 0);
-          alien.velocity = alien.velocity.add(alienInternalForce.scalarMultiply(GAME_LOOP_SPEED_IN_MS / 1000));
-        }
-        if (currentObject instanceof Hero) {
-            if (currentObject.shouldShoot(keyboardListener.isActive(ACTIONS.SHOOT))) {
-                GAME.addObject(createDummy(hero.center.x + 10, hero.center.y, COLORS.BLACK, 5000, 0, 5, 5, 0));
-            }
-        }
-
       }
-
 
       numGameLoops += 1;
       if ((numGameLoops % NUM_LOOPS_IN_FRAME) == 0) {
